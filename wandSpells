@@ -1,0 +1,43 @@
+on("chat:message", function(msg)
+{
+    if (msg.type == "api" && msg.content.indexOf("!wandSpells") == 0){
+        var args = msg.content.split(/\s+/);
+        var spellName = args[1].toLowerCase();
+        var spellLevel = Number(args[2]);
+        var tokenid = msg.selected[0]._id;
+        var token = getObj("graphic",tokenid);
+        var charID = token.get("represents");
+        var tokenName = token.get("name");
+
+        switch(spellName){
+            case "magicmissile":
+                magicMissile(spellLevel);
+                break;
+            case "eldritchblast":
+                eldritchBlast(spellLevel,tokenName);
+                break;
+        }
+
+    }
+});
+
+function magicMissile(spellLevel){
+    var numberOfDarts = spellLevel + 2;
+    var dartOutput = "";
+    for(counter=1;counter<=numberOfDarts;counter++){
+        dartOutput+=`{{Dart ${counter} = [[1d4+1]]}}`;
+    }
+    var outputMessage = `&{template:default} {{name=Magic Missile}} ${dartOutput}`;
+    sendChat("API",outputMessage);
+}
+
+function eldritchBlast(spellLevel,tokenName){
+    var numberOfRays = (spellLevel);
+    var rayOutput = "";
+
+    for (counter=1;counter<=numberOfRays;counter++){
+        rayOutput+=`{{Ray ${counter} Attack [[1d20+@{${tokenName}|spell_attack_bonus} ]]=[[1d10]] Force Damage}}`;
+    }
+    var outputMessage = `&{template:default} {{name=Eldritch Blast}} ${rayOutput}`;
+    sendChat("API",outputMessage);
+}
